@@ -62,16 +62,45 @@ $(".list-group").on("blur", "textarea", function(){
   var status = $(this).closest(".list-group").attr("id").replace("list-", "");
   var index = $(this).closest(".list-group-item").index();
 
-  console.log(text);
-  console.log(status);
-  console.log(index);
-
   tasks[status][index].text = text;
   saveTasks();
 
   var taskP = $("<p>").addClass("m-1").text(text);
   $(this).replaceWith(taskP);
 })
+
+$(".list-group").on("click", "span", function(){
+  //Get the current text of the date
+  var text = $(this).text().trim();
+
+  //Create a new input area and give it class and text vale
+  var dateInput = $("<input>").attr("type", "text").addClass("form-control").val(text);
+
+  //Replace the current span with the date input and set it as focus
+  $(this).replaceWith(dateInput);
+  dateInput.trigger("focus");
+});
+
+$(".list-group").on("blur", "input[type='text']", function(){
+  //Get current text
+  var date = $(this).val().trim();
+
+  //Get the parent ul's id attribute
+  var status = $(this).closest(".list-group").attr("id").replace("list-", "");
+
+  //Get the tasks position in the list of other ul elements
+  var index = $(this).closest(".list-group-item").index();
+
+  //Update task in the array and re-save to localStorage
+  tasks[status][index].date = date;
+  saveTasks();
+
+  //Recreate span with bootstrap classes
+  var dateSpan = $("<span>").addClass("badge badge-primary badge-pill").text(date);
+
+  //Replace input with span
+  $(this).replaceWith(dateSpan);
+});
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
