@@ -1,4 +1,11 @@
-var tasks = {};
+
+var tasks = {
+  toDo: [],
+  inProgress: [],
+  inReview: [],
+  done: []
+};
+
 
 var createTask = function(taskText, taskDate, taskList) {
   // create elements that make up a task item
@@ -57,10 +64,12 @@ $(".list-group").on("click", "p", function(){
 
 //When clicking outside a textarea within a list group, call the function
 $(".list-group").on("blur", "textarea", function(){
-  console.log("clicked elsewhere");
   var text = $(this).val().trim();
   var status = $(this).closest(".list-group").attr("id").replace("list-", "");
   var index = $(this).closest(".list-group-item").index();
+
+  console.log(text, status, index);
+  console.log(tasks[status]);
 
   tasks[status][index].text = text;
   saveTasks();
@@ -147,5 +156,3 @@ $("#remove-tasks").on("click", function() {
 
 // load tasks for the first time
 loadTasks();
-
-
