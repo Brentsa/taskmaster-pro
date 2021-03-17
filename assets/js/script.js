@@ -154,5 +154,56 @@ $("#remove-tasks").on("click", function() {
   saveTasks();
 });
 
+//Sort tasks within and between the 4 list types 
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function(event){
+    //console.log("activate", this);
+  },
+  deactivate: function(event){
+    //console.log("deactivate", this);
+  },
+  over: function(event){
+    //console.log("over", this);
+  },
+  out: function(event){
+    //console.log("out", this);
+  },
+  update: function(event){
+    //temp array to store the task data in
+    var tempArray = [];
+
+    //loop through each task object in the lists and push them into our temp array
+    console.log("update", $(this).children());
+    $(this).children().each(function(){
+      var text = $(this).find("p").text().trim();
+      var date = $(this).find("span").text().trim();
+      tempArray.push({text: text, date: date});
+    });
+
+    //find the id of the list and then save our temp array into the tasks array so we can save the data
+    var arrName = $(this).attr("id").replace("list-", "");
+    tasks[arrName] = tempArray;
+    saveTasks();
+  }
+});
+
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event,ui){
+    ui.draggable.remove();
+  },
+  over: function(event, ui){
+    console.log("over");
+  },
+  out: function(event, ui){
+    console.log("out");
+  }
+});
+
 // load tasks for the first time
 loadTasks();
