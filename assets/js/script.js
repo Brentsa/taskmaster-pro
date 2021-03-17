@@ -20,6 +20,7 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  auditTask(taskLi);
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -52,6 +53,24 @@ var loadTasks = function() {
 
 var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
+};
+
+function auditTask(taskEl) {
+  //create a date string from our task item span
+  var dateString = $(taskEl).find("span").text().trim();
+
+  //convert the date string to a moment object
+  var date = moment(dateString, "L").set("hour", 17);
+
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  if(moment().isAfter(date)){
+    $(taskEl).addClass("list-group-item-danger");
+  }
+  else if(Math.abs(moment().diff(date, "days")) <= 2)
+  {
+    $(taskEl).addClass("list-group-item-warning");
+  }
 };
 
 //When clicking a paragraph in a list group, call the function
@@ -87,10 +106,19 @@ $(".list-group").on("click", "span", function(){
 
   //Replace the current span with the date input and set it as focus
   $(this).replaceWith(dateInput);
+
+  dateInput.datepicker({
+    //minDate: 0,
+    onClose: function(){
+      //When the calendar is closed, force a change event on the dateInput
+      $(this).trigger("change");
+    }
+  });
+
   dateInput.trigger("focus");
 });
 
-$(".list-group").on("blur", "input[type='text']", function(){
+$(".list-group").on("change", "input[type='text']", function(){
   //Get current text
   var date = $(this).val().trim();
 
@@ -109,6 +137,8 @@ $(".list-group").on("blur", "input[type='text']", function(){
 
   //Replace input with span
   $(this).replaceWith(dateSpan);
+
+  auditTask($(dateSpan).closest(".list-group-item"));
 });
 
 // modal was triggered
@@ -203,6 +233,10 @@ $("#trash").droppable({
   out: function(event, ui){
     console.log("out");
   }
+});
+
+$("#modalDueDate").datepicker({
+  //minDate: 0
 });
 
 // load tasks for the first time
